@@ -15,7 +15,7 @@ class MTransliterator
 public:
 	virtual CRMaybe<MSyl> munchSyl( cchar*& pStr ) const = 0;
 
-	virtual string transliterate( const MSyl& syl ) const = 0;
+	virtual string transcribe( const MSyl& syl ) const = 0;
 };
 
 

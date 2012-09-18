@@ -4,14 +4,8 @@
 #include <iostream>
 namespace cphonetic
 {
-
-class MTransliterator;
-class Bopomofo;
-extern const Bopomofo* const bopomofo;
-class MSyl
+namespace msound
 {
-public:
-
 enum INIT:
 	uchar {
 		Void = 0,
@@ -38,7 +32,7 @@ enum TONE:
 
 enum MED:
 	uchar {
-		KAI = 0, I = 0b01000000, U = 0b10000000, IU = 0b11000000,
+		KAI = 0, I = 0b01000000, U = 0b10000000, IU = 0b11000000,MMAGIC = 255,
 	};
 
 enum FIN:
@@ -53,13 +47,36 @@ enum FIN:
 	};
 
 enum RIME:
-	uchar {
-		IA = I | A, IE = I | EH, IO = I | O, IAI = I | AI, IAU = I | AU, IOU = I | OU,
+	uchar {		
+		ZILCH = ZERO,
+		A_ = A,O_ = O,E_ = E,EH_ = EH,Y_ =  Y,EL_ = EL,AI_ = AI,EI_ = EI,AU_ = AU,OU_ = OU,
+		AN_ = AN,EN_ = EN,ANG_ = ANG,ENG_ = ENG,AM_ = AM,EM_ = EM,
+		I_ = I, IA = I | A, IE = I | EH, IO = I | O, IAI = I | AI, IAU = I | AU, IOU = I | OU,
 		IAN = I | AN, IN = I | EN, IANG = I | ANG, ING = I | ENG, IAM = I | AM, IM = I | EM,
-		UA = U | A, UO = U | O, UAI = U | AI, UEI = U | EI, UAN = U | AN, UN = U | EN,
-		UANG = U | ANG, ONG = U | ENG,
-		IUO = IU | O, IUE = IU | EH, IUAN = IU | AN, IUN = IU | EN, IONG = IU | ENG,
+		U_ = U, UA = U | A, UO = U | O, UAI = U | AI, UEI = U | EI, UAN = U | AN, UN = U | EN,
+		UANG = U | ANG, ONG = U | ENG, UEH = U | EH,//This is only for pinyin transcription
+		IU_ = IU, IUO = IU | O, IUE = IU | EH, IUAN = IU | AN, IUN = IU | EN, IONG = IU | ENG,
 	};
+
+	
+}
+	
+class MTransliterator;
+class Bopomofo;
+class Pinyin;
+class MarkedPinyin;
+//global transliterator variables
+extern const Bopomofo bopomofo;
+extern const Pinyin pinyin;
+extern const MarkedPinyin mpinyin;
+
+
+using namespace msound;
+class MSyl
+{
+	
+	
+public:
 
 
 	friend class CRMaybe<MSyl>;
@@ -68,8 +85,8 @@ enum RIME:
 
 
 
-	bool operator==( MSyl rhs ) {return _asUShort == rhs._asUShort;}
-	bool operator<( MSyl rhs );
+	bool operator==( MSyl rhs )const {return _asUShort == rhs._asUShort;}
+	bool operator<( MSyl rhs )const;
 
 	INIT init() const {return INIT( _initTone & IMASK );}
 	void init( INIT i ) { _initTone = TMASK & _initTone | i;}
@@ -85,6 +102,7 @@ enum RIME:
 	INITGROUP group() const {return INITGROUP( ( (init() + 5 )/ 6 ) );}
 	MSyl dup() const {return MSyl( _asUShort );}
 	string toStr() const;
+	string toStr(const MTransliterator& trans)const;
 
 private:
 	MSyl( uchar initTone, RIME rime ): _initTone( initTone ), _rime( rime ) {}
@@ -107,8 +125,8 @@ private:
 	};
 	//endregion data members
 };
-inline MSyl::RIME operator|( MSyl::MED lhs, MSyl::FIN rhs ) {return MSyl::RIME( int( lhs ) | int( rhs ) );}
-inline MSyl::RIME operator|( MSyl::FIN lhs, MSyl::MED rhs ) {return rhs | lhs;}
+inline RIME operator|( MED lhs, FIN rhs ) {return RIME( int( lhs ) | int( rhs ) );}
+inline RIME operator|( FIN lhs, MED rhs ) {return rhs | lhs;}
 ostream& operator<<( ostream& os, const MSyl& ms );
 }
 #endif // MANDARIN_HEADER_GUARD

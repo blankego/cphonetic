@@ -3,6 +3,7 @@
 #include <memory>
 #include <iostream>
 #include <cstring>
+#include <map>
 typedef unsigned char uchar;
 typedef unsigned int uint;
 typedef unsigned short ushort;
@@ -13,6 +14,14 @@ typedef const uint cuint;
 typedef const double cdouble;
 typedef const float cfloat;
 
+#define PAUTO(a,b,pr) ;const decltype((pr).first)& a;const decltype((pr).second)& b;\
+	{const auto& tmp=(pr);a=tmp.first;b=tmp.second;}
+#define PASSIGN(a,b,pr) {const auto& tmp=(pr);a=tmp.first;b=tmp.second;}
+#define TUP(...) make_tuple(__VA_ARGS__)
+#define PR(a,b) make_pair((a),(b))
+#define findOr(a,b) make_pair((a),(b))
+#define T3ASSIGN(a,b,c,tup) ;{const auto& tmp=(tup);a=get<0>(tup);b=get<1>(tup);c=get<2>(tup);}
+#define T3AUTO(a,b,c,tup);const auto& a = get<0>
 using namespace std;
 template<class T>
 struct CRMaybe final
@@ -24,8 +33,8 @@ struct CRMaybe final
 	CRMaybe(const T& val):value(val),hasValue(true){}
 	CRMaybe():value(T()),hasValue(false){}
 	CRMaybe(nullptr_t np):value(T()),hasValue(np){}	
-	operator bool(){return hasValue;}
-	operator const T(){return value;}
+	operator bool()const{return hasValue;}
+	operator const T&()const{return value;}
 	
 	CRMaybe& operator=(const CRMaybe& other)
 	{
@@ -40,6 +49,30 @@ struct CRMaybe final
 
 template <class T>
 CRMaybe<T> crmaybe(const T& val){return CRMaybe<T>(val);}
+template<int SIZE,class CharT=char,CharT DELIM = '\n'>
+class linebuf
+{
+	CharT buf[SIZE];
+public:
+	linebuf(){buf[0]=0;}
+	operator CharT*(){return &buf[0];}
+	operator const CharT*()const {return &buf[0];}
+	CharT* operator &(){return &buf[0];}
+	operator bool(){return buf[0] != 0;}
+	linebuf& operator<<(basic_istream<CharT>& ins)
+	{
+		buf[0]=0;ins.getline(buf,ins.widen(DELIM));return *this;		
+	}
+	
+};
+
+
+template<class K,class V>
+inline V operator^(const map<K,V>& m, const pair<K,V>& pr)
+{
+	auto it = m.find(pr.first);
+	return (it == m.end()) ? pr.second : it->second;
+}
 
 // struct StrSlice	
 // {

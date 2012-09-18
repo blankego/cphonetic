@@ -1,25 +1,29 @@
 #ifndef BOPOMOFO_H
 #define BOPOMOFO_H
-#include "transliterators.h"
+#include "transcriptor.h"
 
 namespace cphonetic
 {
+
+using namespace msound;
+
 class Bopomofo: public MTransliterator
 {
-	static TokenDict<MSyl::INIT> _iDict;
-	static TokenDict<MSyl::MED> _mDict;
-	static TokenDict<MSyl::FIN> _fDict;
-	static TokenDict<MSyl::TONE> _tDict;
-	static map<MSyl::INIT, cchar*>_iTrans;
-	static map<MSyl::MED, cchar*> _mTrans;
-	static map<MSyl::FIN, cchar*> _fTrans;
-	static map<MSyl::TONE, cchar*> _tTrans;
-	static map<MSyl::INIT, cchar*> _giGrp; //ㄐㄑㄬㄒ group
+	
+	static TokenDict<INIT> _iDict;
+	static TokenDict<MED> _mDict;
+	static TokenDict<FIN> _fDict;
+	static TokenDict<TONE> _tDict;
+	static map<INIT, cchar*>_iTrans;
+	static map<MED, cchar*> _mTrans;
+	static map<FIN, cchar*> _fTrans;
+	static map<TONE, cchar*> _tTrans;
+	static map<INIT, cchar*> _giGrp; //ㄐㄑㄬㄒ group
 
 public:
 	virtual CRMaybe<MSyl> munchSyl( cchar*& pStr ) const;
 
-	virtual string transliterate ( const MSyl& syl )const;
+	virtual string transcribe ( const MSyl& syl )const;
 	
 };
 	

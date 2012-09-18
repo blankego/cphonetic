@@ -5,6 +5,8 @@
 #include "helper.h"
 #include "tokendict.h"
 #include "bopomofo.h"
+#include "pinyin.h"
+#include "marked_pinyin.h"
 #include <iostream>
 #include <fstream>
 #include <array>
@@ -27,37 +29,38 @@ BOOST_AUTO_TEST_CASE(maybe)
 	const double& d = crmaybe(42.0);
 	BOOST_CHECK_EQUAL(42,d);
 }
-
+using namespace cphonetic::msound;
 BOOST_AUTO_TEST_CASE( msyl )
 {
-	MSyl juang4( MSyl::J, MSyl::U, MSyl::ANG, MSyl::DEPARTING );
+	
+	MSyl juang4( J, U, ANG, DEPARTING );
 	int size = sizeof( juang4 );
 	auto init = juang4.init();
 	auto med = juang4.med();
 	auto fin = juang4.fin();
 	auto tone = juang4.tone();
-	auto rime = MSyl::RIME(med | fin);
+	auto rime = RIME(med | fin);
 	
 	BOOST_CHECK_EQUAL( 2, size );
-	BOOST_CHECK_EQUAL( MSyl::J, init );
-	BOOST_CHECK_EQUAL( MSyl::U, med );
-	BOOST_CHECK_EQUAL( MSyl::ANG, fin );
-	BOOST_CHECK_EQUAL( MSyl::DEPARTING, tone );
+	BOOST_CHECK_EQUAL( J, init );
+	BOOST_CHECK_EQUAL( U, med );
+	BOOST_CHECK_EQUAL( ANG, fin );
+	BOOST_CHECK_EQUAL( DEPARTING, tone );
 	BOOST_CHECK_EQUAL( juang4.rime(),rime);
 	
-	MSyl j2 (MSyl::J,MSyl::U,MSyl::ANG,MSyl::DEPARTING);
+	MSyl j2 (J,U,ANG,DEPARTING);
 	BOOST_CHECK(juang4==j2);
-	j2.tone(MSyl::RISING);
+	j2.tone(RISING);
 	BOOST_CHECK(j2 < juang4);
-	BOOST_CHECK_EQUAL(MSyl::RISING, j2.tone());
-	j2.init(MSyl::G);
-	BOOST_CHECK_EQUAL(MSyl::G, j2.init());
-	j2.med(MSyl::KAI);
-	BOOST_CHECK_EQUAL(MSyl::KAI , j2.med());
-	j2.fin(MSyl::ENG);
-	BOOST_CHECK_EQUAL(MSyl::ENG,j2.fin());
-	j2.med(MSyl::U);
-	BOOST_CHECK_EQUAL((MSyl::U|MSyl::ENG),j2.rime());
+	BOOST_CHECK_EQUAL(RISING, j2.tone());
+	j2.init(G);
+	BOOST_CHECK_EQUAL(G, j2.init());
+	j2.med(KAI);
+	BOOST_CHECK_EQUAL(KAI , j2.med());
+	j2.fin(ENG);
+	BOOST_CHECK_EQUAL(ENG,j2.fin());
+	j2.med(U);
+	BOOST_CHECK_EQUAL((U|ENG),j2.rime());
 };
 
 BOOST_AUTO_TEST_CASE( tokendict )
@@ -101,16 +104,16 @@ BOOST_AUTO_TEST_CASE(bopomofo_test)
 {
 	cchar* s = "ㄓㄨㄤˋa", *p = s,*s0 = "ㄓㄨㄤˋ";
 	
-	auto syl =  Bopomofo().munchSyl(p);
+	auto syl =  bopomofo.munchSyl(p);
 	syl.value.toStr();
 	BOOST_CHECK_EQUAL("a",p);
 // 	cout << typeid(syl.value).name() <<endl;
 	BOOST_CHECK_EQUAL(s0,syl.value.toStr());
-	BOOST_CHECK_EQUAL(MSyl::JGRP,syl.value.group());
+	BOOST_CHECK_EQUAL(JGRP,syl.value.group());
 	cchar* s1 = "ㄐㄩㄢˇ";
 	p = s1;
-	auto syl1 = bopomofo->munchSyl(p);
-	BOOST_CHECK_EQUAL(MSyl::GGRP,syl1.value.group());
+	auto syl1 = bopomofo.munchSyl(p);
+	BOOST_CHECK_EQUAL(GGRP,syl1.value.group());
 	BOOST_CHECK(syl1.value.isPalatized());
 	char line[50];
 	vector<string>syls;
@@ -122,10 +125,48 @@ BOOST_AUTO_TEST_CASE(bopomofo_test)
 	{
 		//cout << i++ <<endl;
 		cchar* p = &s[0];
-		auto thesyl = bopomofo->munchSyl(p);
+		auto thesyl = bopomofo.munchSyl(p);
 		if(!thesyl)cout << "wtf"<<","<<s<<endl;
 		BOOST_CHECK_EQUAL(s,thesyl.value.toStr());
 	}
 	
 	
+}
+
+BOOST_AUTO_TEST_CASE(pinyin_test)
+{
+	cchar* s="zhuang4",*p=s;
+	MSyl syl = pinyin.munchSyl(p);
+	string bpmf = syl.toStr();
+	cchar* pBpmf = &bpmf[0];
+	BOOST_CHECK_EQUAL(syl,bopomofo.munchSyl(pBpmf).value);
+	fstream f("all_syllables.txt",ios_base::in);
+	linebuf<50> lb;
+	while(lb<<f)
+	{
+		cchar*p =&lb;
+		MSyl thesyl = bopomofo.munchSyl(p);
+		string str = thesyl.toStr(pinyin);
+		p=&str[0];
+		BOOST_CHECK_EQUAL(thesyl,pinyin.munchSyl(p).value);
+	}
+}
+BOOST_AUTO_TEST_CASE(mpinyin_test)
+{
+	fstream f("all_syllables.txt",ios_base::in);
+	linebuf<50> lb;
+	while(lb<<f)
+	{
+		cchar* p = &lb;
+		MSyl syl = bopomofo.munchSyl(p);
+		string str = syl.toStr(mpinyin);
+		p=&str[0];
+		auto m = mpinyin.munchSyl(p).value;
+		BOOST_CHECK_EQUAL(syl,m);
+		if(m.toStr()!=syl.toStr())
+		{
+			cout<< syl.toStr()<<str<<m.toStr()<<endl;
+		}
+		
+	}
 }

@@ -23,7 +23,7 @@ struct CharAt {
 	*/
 	inline bool operator<( S s ) const {
 		TChar cOther = s[at];
-		return ch < cOther;
+		return memcmp( &ch, &cOther, sizeof( TChar ) ) < 0; // /*(ushort)*/ch < /*(ushort)*/cOther;//default signed char is nasty
 	}
 };
 
@@ -33,65 +33,99 @@ struct CharAt {
  * @param ca ca.at indicates the index of the lefthand side char of the string s, and the ca.ch is the
  * 		char to be compared with
  */
-template <class S,class TChar>
+template <class S, class TChar>
 inline bool operator<( S s, CharAt<TChar> ca )
 {
 	TChar cThis = s[ca.at] ;
-	return cThis < ca.ch;
+	return ( uint )cThis < ( uint )ca.ch;
 }
 
 template <class TChar>
-inline CharAt<TChar> charAt(TChar ch, int pos){return CharAt<TChar>(ch,pos);}
+inline CharAt<TChar> charAt( TChar ch, int pos ) {return CharAt<TChar>( ch, pos );}
 
 template<class TVal, class TChar = char>
 struct TokenDict {
-	typedef pair<const TChar*,TVal> _pair;
-	typedef vector<_pair > EntVector;
-	
-	TokenDict( EntVector lst ){
-		sort( lst.begin(), lst.end(), []( const _pair& lhs, const _pair& rhs ) {
-			return strcmp( ( cchar* )(lhs.first), ( cchar* )(rhs.first) ) < 0;
-		} );
-		
-		for(auto p: lst)
-		{
-			_keys.push_back(p.first);
-			_vals.push_back(p.second);
-		}
-	};
+	typedef pair<const TChar*, TVal> _pair;
+	typedef initializer_list<_pair > EntLst;
 
-	CRMaybe<TVal> matchStart( const TChar*& pStr );	
+	TokenDict( EntLst lst ); 
+	const vector<const TChar*>& keys() const {return _keys;}
+	const vector<TVal>& values() const {return _vals;}
+	CRMaybe<TVal> matchStart( const TChar*& pStr );
 private:
 	vector<const TChar*> _keys;
+	vector<size_t> _sizes;
 	vector<TVal> _vals;
+	bool _caseSensitive;//TODO:
 
 };
 
-template<class TVal,class TChar>
-CRMaybe<TVal> TokenDict<TVal,TChar>::matchStart( const TChar*& pStr )
+template<class TVal, class TChar>
+TokenDict<TVal,TChar>::TokenDict(EntLst lst){
+	typedef tuple<const TChar*, size_t, TVal> tup3;
+	vector<tup3 > tlst( lst.size() );
+	transform( lst.begin(), lst.end(), tlst.begin(), []( const _pair & pr ) {
+		return make_tuple( pr.first, strlen( ( cchar* )pr.first ), pr.second );
+	} );
+
+	sort( tlst.begin(), tlst.end(), []( const tup3 & lhs, const tup3 & rhs ) {
+		auto lkey = get<0>( lhs ), rkey = get<0>( rhs );
+		auto llen = get<1>( lhs ), rlen = get<1>( rhs );
+		bool lt = llen < rlen;
+		int res = memcmp( lkey, rkey, lt ? llen : rlen );
+		return ( res == 0 ) ? lt : ( res < 0 );
+	} );
+
+	for( const tup3& t: tlst ) {
+		_keys.push_back( get<0>( t ) );
+		_sizes.push_back( get<1>( t ) );
+		_vals.push_back( get<2>( t ) );
+	}
+
+}
+
+template<class TVal, class TChar>
+CRMaybe<TVal> TokenDict<TVal, TChar>::matchStart( const TChar*& pStr )
 {
+	
 	auto head = _keys.begin();
-	auto tail = _keys.end();
-	int pos = 0;
-	TChar c = *pStr;
-	do{
+	auto tail = _keys.end(), candidate = tail;
+	size_t pos = 0, rollbackPos = 0;
+	TChar c = pStr[0];
+
+	do {
 		auto range = equal_range( head, tail, charAt( c, pos ) );
-		if( range.first == range.second ) // current char not matched
+	
+		if( range.first == range.second ){ // current char not matched
+			pos = rollbackPos;
 			break;
-		else {
+		}else {
 			head = range.first;
 			tail = range.second;
+			if(tail - head == 1){//check the only left candidate
+				size_t restLen = _sizes[head - _keys.begin()] - pos;
+				if(restLen == 0 || memcmp(pStr + pos, (*head + pos), restLen) == 0){
+					candidate = head;
+					pos += restLen;
+				}
+				else{
+					pos = rollbackPos;
+				}
+				break;
+			}else if( ( *head )[pos + 1] == '\0' ) { //range match & check if the first el qualified as a candidate
+				rollbackPos = pos + 1;
+				candidate = head;
+			}
 		}
 
-	}while((c !='\0')&&(c = *++pStr, ++pos));
-	
+	} while( c = pStr[++pos] );
 
-	if( ( *head )[pos] == '\0' )
-		return crmaybe(_vals[head - _keys.begin()]);
-	else 
-	{
-		if( pos > 0 ) // false match: rollback!
-			pStr -= pos;
+	pStr += pos;
+	if(candidate != _keys.end()){
+		return crmaybe( _vals[candidate - _keys.begin()] );
+	}else if((*head)[pos]=='\0'){//empty key matches any thing!
+		return crmaybe(_vals[head - _keys.begin()]);			
+	}else {		
 		return nullptr;
 	}
 
