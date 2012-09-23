@@ -20,58 +20,63 @@
 
 #include "pinyin.h"
 #include "mandarin.h"
+#include "tokendict.h"
 namespace cphonetic
 {
 using namespace msound;
 
-CRMaybe<MSyl> Pinyin::munchSyl( cchar*& pStr )const
+CRMaybe<MSyl> Pinyin::munchSyl(cchar*& pStr)const
 {
 	INIT init = Void;
-	MED med = MED( 0 );
+	MED med = MED(0);
 	FIN fin = ZERO;
 	TONE tone;
-	auto pr = _imDict.matchStart( pStr );
+	auto pr = _imDict.matchStart(pStr);
 
-	if( pr )PASSIGN( init, med, pr.value );
+	if(pr)PASSIGN(init, med, pr.value);
 
-	if( init >= J && med == IU ) {
+	if(init >= J && med == IU) {
 		fin = Y;
 	} else {
-		fin = _fDict.matchStart( pStr );
+		fin = _fDict.matchStart(pStr);
 
-		if( fin == E && ( ( med & I ) == I ) ) {
+		if(fin == E && ((med & I) == I)) {
 			fin = EH;
-		} else if( fin == Y ) {
+		} else if(fin == Y) {
 			fin == ENG;
 
-			if( med == I )
+			if(med == I)
 				med == IU;
 		}
 	}
 
-	if( ( init | med | fin ) == 0 )return nullptr;
+	if((init | med | fin) == 0)return nullptr;
 
-	tone = _tDict.matchStart( pStr );
+	tone = _tDict.matchStart(pStr);
 
-	return MSyl( init, med, fin, tone );
+	return MSyl(init, med, fin, tone);
 }
-string Pinyin::transcribe( const MSyl& syl )const
+
+
+string Pinyin::transcribe(const MSyl& syl)const
 {
 	string im, f;
-	im = _imTrans[make_pair( syl.init(), syl.med() )];
+	im = _imTrans[make_pair(syl.init(), syl.med())];
 
-	if( syl.fin() == ZERO ) {
-		if(syl.init()==Void)
-			f = syl.med()==I ? "i" : "u";
+	if(syl.fin() == ZERO) {
+		if(syl.init() == Void)
+			f = syl.med() == I ? "i" : syl.med() == U ? "u" : "";
 		else
 			f = "";
-	} else if(syl.med()==U && syl.fin()==EI)
-		f = "i";
-	else if(syl.med()==I && syl.fin()==OU)
-		f= "u";
-	else	
+	} else if(syl.fin() == EI && syl.med() == U)
+		f = syl.init() == Void ? "ei": "i";
+	else if(syl.fin() == OU && syl.med() == I )
+		f = syl.init() == Void ? "ou": "u";
+	else if(syl.fin() == EH && syl.med() == KAI)
+		f = "ê";
+	else
 		f = _fTrans[syl.fin()];
-	
+
 
 	return im + f + _tTrans[syl.tone()];
 }

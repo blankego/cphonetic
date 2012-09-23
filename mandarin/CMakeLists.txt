@@ -1,4 +1,4 @@
-SET(mandarin_lib_src 
+SET(mandarin_lib_src gworo.cxx 
 	marked_pinyin.cxx 
 	marked_pinyin_data.cxx
 	bopomofo.cxx 

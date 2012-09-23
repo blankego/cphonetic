@@ -10,7 +10,9 @@
 #include <iostream>
 #include <fstream>
 #include <array>
+#include <chrono>
 using namespace cphonetic;
+using namespace std::chrono;
 using namespace std;
 BOOST_AUTO_TEST_CASE(maybe)
 {
@@ -26,8 +28,8 @@ BOOST_AUTO_TEST_CASE(maybe)
 	BOOST_CHECK_EQUAL(false,b);
 	
 	
-	const double& d = crmaybe(42.0);
-	BOOST_CHECK_EQUAL(42,d);
+	const double d = crmaybe(42.0);
+	BOOST_CHECK_EQUAL(42.0,d);
 }
 using namespace cphonetic::msound;
 BOOST_AUTO_TEST_CASE( msyl )
@@ -115,21 +117,25 @@ BOOST_AUTO_TEST_CASE(bopomofo_test)
 	auto syl1 = bopomofo.munchSyl(p);
 	BOOST_CHECK_EQUAL(GGRP,syl1.value.group());
 	BOOST_CHECK(syl1.value.isPalatized());
-	char line[50];
-	vector<string>syls;
+	
+	
 	fstream f("all_syllables.txt",ios_base::in);
+	vector<string>lines;
+	linebuf<50> lb;
 	
-	while(f.getline(line,50,'\n'))syls.push_back(string(line));
-	//int i = 1;
-	for(const string& s : syls)
-	{
-		//cout << i++ <<endl;
-		cchar* p = &s[0];
-		auto thesyl = bopomofo.munchSyl(p);
-		if(!thesyl)cout << "wtf"<<","<<s<<endl;
-		BOOST_CHECK_EQUAL(s,thesyl.value.toStr());
+	while(lb<<f)lines.push_back(&lb);	
+	time_point<system_clock> end,start = system_clock::now();
+	for(string l : lines)
+	{	cchar* pl = &l[0];
+		auto thesyl = bopomofo.munchSyl(pl);
+		string sl = thesyl.value.toStr();
+		if(!thesyl)cout << "wtf"<<","<<sl<<endl;
+		BOOST_CHECK_EQUAL( l,sl);
 	}
-	
+	end = system_clock::now();
+	cout << lines.size() <<" Bopomofo entries processed in "
+		<<duration_cast<microseconds>(end-start).count()<<" microseconds.\n\n";
+	f.close();
 	
 }
 
@@ -141,23 +147,33 @@ BOOST_AUTO_TEST_CASE(pinyin_test)
 	cchar* pBpmf = &bpmf[0];
 	BOOST_CHECK_EQUAL(syl,bopomofo.munchSyl(pBpmf).value);
 	fstream f("all_syllables.txt",ios_base::in);
+	vector<cchar*> lines;
 	linebuf<50> lb;
-	while(lb<<f)
-	{
-		cchar*p =&lb;
+	while(lb<<f)lines.push_back(&lb);
+	time_point<system_clock> end,start = system_clock::now();
+	for(cchar*p : lines)	{	
+		
 		MSyl thesyl = bopomofo.munchSyl(p);
 		string str = thesyl.toStr(pinyin);
 		p=&str[0];
 		BOOST_CHECK_EQUAL(thesyl,pinyin.munchSyl(p).value);
+		
 	}
+	end = system_clock::now();
+	cout << lines.size() <<" Pinyin entries processed in "
+		<<duration_cast<microseconds>(end-start).count()<<" microseconds.\n\n";
+	f.close();
 }
 BOOST_AUTO_TEST_CASE(mpinyin_test)
 {
 	fstream f("all_syllables.txt",ios_base::in);
-	linebuf<50> lb;
-	while(lb<<f)
+	vector<cchar*> lines;
+	linebuf<50> lb;	
+	while(lb<<f)lines.push_back(&lb);
+	time_point<system_clock> end,start = system_clock::now();
+	for(cchar*p : lines)
 	{
-		cchar* p = &lb;
+		//cchar* p = &lb;
 		MSyl syl = bopomofo.munchSyl(p);
 		string str = syl.toStr(mpinyin);
 		p=&str[0];
@@ -169,4 +185,8 @@ BOOST_AUTO_TEST_CASE(mpinyin_test)
 		}
 		
 	}
+	end = system_clock::now();
+	cout << lines.size() <<" Marked Pinyin entries processed in "
+		<<duration_cast<microseconds>(end-start).count()<<" microseconds."<<endl;
+	f.close();
 }

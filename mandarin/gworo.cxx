@@ -18,37 +18,5 @@
 */
 
 
-#ifndef PINYIN_H
-#define PINYIN_H
-#include "transcriptor.h"
-#include <map>
-#include "mandarin.h"
-#include <string>
-#include "tokendict.h"
-namespace cphonetic 
-{	
+#include "gworo.h"
 
-
-using namespace msound;
-using namespace std;
-
-class Pinyin: public MTranscriptor
-{
-protected:
-	static TokenDict<pair<INIT,MED> > _imDict;
-	
-	static TokenDict<FIN> _fDict;
-	static TokenDict<TONE> _tDict;
-	static map<pair<INIT,MED>, cchar*>_imTrans;
-	
-	static map<FIN, cchar*> _fTrans;
-	static map<TONE, cchar*> _tTrans;
-	static map<pair<INIT,MED>, cchar*> _giGrp; //ㄐㄑㄬㄒ group
-public:
-	virtual CRMaybe<MSyl> munchSyl(cchar*& pStr)const;
-	virtual string transcribe(const MSyl& syl)const;
-};
-
-}//end namespace
-
-#endif // PINYIN_H

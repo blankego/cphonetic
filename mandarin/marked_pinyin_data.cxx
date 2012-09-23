@@ -17,6 +17,7 @@ TokenDict<tuple<INIT, MED, TONE> > MarkedPinyin::_miDict = {
 	{"z", TUP( TZ, KAI, NEUTRAL )}, {"c", TUP( TS, KAI, NEUTRAL )}, {"s", TUP( S, KAI, NEUTRAL )},
 
 	{"bi", TUP( B, I, NEUTRAL )}, {"pi", TUP( P, I, NEUTRAL )}, {"mi", TUP( M, I, NEUTRAL )},
+	{"fi",TUP(F,I,NEUTRAL)},
 	{"di", TUP( D, I, NEUTRAL )}, {"ti", TUP( T, I, NEUTRAL )},
 	{"ni", TUP( N, I, NEUTRAL )}, {"li", TUP( L, I, NEUTRAL )},
 	{"ji", TUP( G, I, NEUTRAL )}, {"qi", TUP( K, I, NEUTRAL )},
@@ -43,6 +44,7 @@ TokenDict<tuple<INIT, MED, TONE> > MarkedPinyin::_miDict = {
 
 
 	{"bī", TUP( B, I, DARK )}, {"pī", TUP( P, I, DARK )}, {"mī", TUP( M, I, DARK )},
+	{"fī",TUP(F,I,DARK)},
 	{"dī", TUP( D, I, DARK )}, {"tī", TUP( T, I, DARK )},
 	{"nī", TUP( N, I, DARK )}, {"lī", TUP( L, I, DARK )},
 	{"jī", TUP( G, I, DARK )}, {"qī", TUP( K, I, DARK )},
@@ -69,6 +71,7 @@ TokenDict<tuple<INIT, MED, TONE> > MarkedPinyin::_miDict = {
 
 
 	{"bí", TUP( B, I, LIGHT )}, {"pí", TUP( P, I, LIGHT )}, {"mí", TUP( M, I, LIGHT )},
+	{"fí",TUP(F,I,LIGHT)},
 	{"dí", TUP( D, I, LIGHT )}, {"tí", TUP( T, I, LIGHT )},
 	{"ní", TUP( N, I, LIGHT )}, {"lí", TUP( L, I, LIGHT )},
 	{"jí", TUP( G, I, LIGHT )}, {"qí", TUP( K, I, LIGHT )},
@@ -95,6 +98,7 @@ TokenDict<tuple<INIT, MED, TONE> > MarkedPinyin::_miDict = {
 
 
 	{"bǐ", TUP( B, I, RISING )}, {"pǐ", TUP( P, I, RISING )}, {"mǐ", TUP( M, I, RISING )},
+	{"fǐ",TUP(F,I,RISING)},
 	{"dǐ", TUP( D, I, RISING )}, {"tǐ", TUP( T, I, RISING )},
 	{"nǐ", TUP( N, I, RISING )}, {"lǐ", TUP( L, I, RISING )},
 	{"jǐ", TUP( G, I, RISING )}, {"qǐ", TUP( K, I, RISING )},
@@ -121,6 +125,7 @@ TokenDict<tuple<INIT, MED, TONE> > MarkedPinyin::_miDict = {
 
 
 	{"bì", TUP( B, I, DEPARTING )}, {"pì", TUP( P, I, DEPARTING )}, {"mì", TUP( M, I, DEPARTING )},
+	{"fì",TUP(F,I,DEPARTING)},
 	{"dì", TUP( D, I, DEPARTING )}, {"tì", TUP( T, I, DEPARTING )},
 	{"nì", TUP( N, I, DEPARTING )}, {"lì", TUP( L, I, DEPARTING )},
 	{"jì", TUP( G, I, DEPARTING )}, {"qì", TUP( K, I, DEPARTING )},

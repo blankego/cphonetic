@@ -13,7 +13,7 @@ namespace cphonetic
 						tone() < rhs.tone();
 				
 	}
-	CRMaybe<MSyl> MSyl::from(MTransliterator* trans,cchar* sPtr)
+	CRMaybe<MSyl> MSyl::from(MTranscriptor* trans,cchar* sPtr)
 	{
 		return trans->munchSyl(sPtr);
 	}
@@ -22,7 +22,7 @@ namespace cphonetic
 	{
 		return bopomofo.transcribe(*this);
 	}
-	string MSyl::toStr(const MTransliterator& trans)const
+	string MSyl::toStr(const MTranscriptor& trans)const
 	{
 		return trans.transcribe(*this);
 	}

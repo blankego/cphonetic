@@ -21,7 +21,7 @@
 #ifndef MARKED_PINYIN_H
 #define MARKED_PINYIN_H
 #include "pinyin.h"
-#include "mandarin.h"
+
 namespace cphonetic 
 {
 

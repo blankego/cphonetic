@@ -1,13 +1,15 @@
 #ifndef BOPOMOFO_H
 #define BOPOMOFO_H
 #include "transcriptor.h"
-
+#include "shortnames.h"
+#include "msound.h"
+#include "tokendict.h"
 namespace cphonetic
 {
 
 using namespace msound;
 
-class Bopomofo: public MTransliterator
+class Bopomofo: public MTranscriptor
 {
 	
 	static TokenDict<INIT> _iDict;
@@ -21,9 +23,9 @@ class Bopomofo: public MTransliterator
 	static map<INIT, cchar*> _giGrp; //ㄐㄑㄬㄒ group
 
 public:
-	virtual CRMaybe<MSyl> munchSyl( cchar*& pStr ) const;
+	virtual CRMaybe<MSyl> munchSyl(cchar*& pStr) const;
 
-	virtual string transcribe ( const MSyl& syl )const;
+	virtual string transcribe(const MSyl& syl)const;
 	
 };
 	
