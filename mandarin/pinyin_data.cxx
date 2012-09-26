@@ -37,9 +37,9 @@ namespace cphonetic
 		{"zü",{TZ,IU}},{"cü",{TS,IU}},{"sü",{S,IU}},
 		{"yu",{Void,IU}},
 		//use special combination to substitute zhi...
-		{"zhi",{J,IU}},{"chi",{CH,IU}},
-		{"shi",{SH,IU}},{"ri",{R,IU}},
-		{"zi",{TZ,IU}},{"ci",{TS,IU}},{"si",{S,IU}},
+		{"zhi",{J,MMAGIC}},{"chi",{CH,MMAGIC}},
+		{"shi",{SH,MMAGIC}},{"ri",{R,MMAGIC}},
+		{"zi",{TZ,MMAGIC}},{"ci",{TS,MMAGIC}},{"si",{S,MMAGIC}},
 		
 	};
 	

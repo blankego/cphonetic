@@ -43,10 +43,10 @@ CRMaybe<MSyl> Pinyin::munchSyl(cchar*& pStr)const
 		if(fin == E && ((med & I) == I)) {
 			fin = EH;
 		} else if(fin == Y) {
-			fin == ENG;
+			fin = ENG;//TODO:
 
 			if(med == I)
-				med == IU;
+				med = IU;//TODO:
 		}
 	}
 

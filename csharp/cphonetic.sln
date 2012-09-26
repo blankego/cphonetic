@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPhoneticTest", "CPhoneticTest\CPhoneticTest.csproj", "{0BE201EA-58B1-43ED-85EE-CB5CEAD57D10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CPhonetic", "CPhonetic\CPhonetic.csproj", "{6312B205-161A-46C9-998F-DC95B0BEEFD3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground", "Playground\Playground.csproj", "{9F787376-7EBC-4D10-A5E5-12A54811EB55}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Default|Any CPU = Default|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BE201EA-58B1-43ED-85EE-CB5CEAD57D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE201EA-58B1-43ED-85EE-CB5CEAD57D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BE201EA-58B1-43ED-85EE-CB5CEAD57D10}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BE201EA-58B1-43ED-85EE-CB5CEAD57D10}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{0BE201EA-58B1-43ED-85EE-CB5CEAD57D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BE201EA-58B1-43ED-85EE-CB5CEAD57D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6312B205-161A-46C9-998F-DC95B0BEEFD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6312B205-161A-46C9-998F-DC95B0BEEFD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6312B205-161A-46C9-998F-DC95B0BEEFD3}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{6312B205-161A-46C9-998F-DC95B0BEEFD3}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{6312B205-161A-46C9-998F-DC95B0BEEFD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6312B205-161A-46C9-998F-DC95B0BEEFD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F787376-7EBC-4D10-A5E5-12A54811EB55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F787376-7EBC-4D10-A5E5-12A54811EB55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F787376-7EBC-4D10-A5E5-12A54811EB55}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F787376-7EBC-4D10-A5E5-12A54811EB55}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{9F787376-7EBC-4D10-A5E5-12A54811EB55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F787376-7EBC-4D10-A5E5-12A54811EB55}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Playground\Playground.csproj
+	EndGlobalSection
+EndGlobal
