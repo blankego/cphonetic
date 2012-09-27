@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(cphonetic)
 list(APPEND CMAKE_CXX_FLAGS -std=c++11)
-INCLUDE_DIRECTORIES(include mandarin) 
+INCLUDE_DIRECTORIES(include mandarin mandarin/tranliterators) 
 
 add_subdirectory(mandarin)
 add_subdirectory(include)

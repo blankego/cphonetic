@@ -6,7 +6,7 @@
 #include "tokendict.h"
 #include "bopomofo.h"
 #include "pinyin.h"
-#include "marked_pinyin.h"
+#include "altpinyin.h"
 #include <iostream>
 #include <fstream>
 #include <array>
@@ -31,6 +31,8 @@ BOOST_AUTO_TEST_CASE(maybe)
 	const double d = crmaybe(42.0);
 	BOOST_CHECK_EQUAL(42.0,d);
 }
+
+
 using namespace cphonetic::msound;
 BOOST_AUTO_TEST_CASE( msyl )
 {
@@ -65,6 +67,7 @@ BOOST_AUTO_TEST_CASE( msyl )
 	BOOST_CHECK_EQUAL((U|ENG),j2.rime());
 };
 
+
 BOOST_AUTO_TEST_CASE( tokendict )
 {
 	TokenDict<cchar*> td ({
@@ -81,42 +84,43 @@ BOOST_AUTO_TEST_CASE( tokendict )
 	
 	cchar* s = "gang";
 	cchar* p = s;	
-	BOOST_CHECK_EQUAL("empty",d2.matchStart(p).value);	
+	BOOST_CHECK_EQUAL("empty",d2.matchStart(p));	
  	BOOST_CHECK_EQUAL(s,p);
 	
- 	BOOST_CHECK_EQUAL("g",td.matchStart(p).value);
+ 	BOOST_CHECK_EQUAL("g",td.matchStart(p));
 	p = "b";
-	BOOST_CHECK_EQUAL("b",td.matchStart(p).value);
+	BOOST_CHECK_EQUAL("b",td.matchStart(p));
 	s= "012";
 	p=s;
-	BOOST_CHECK_EQUAL(false,td.matchStart(p).hasValue);
+	BOOST_CHECK(td.matchStart(p) == nullptr);
 	BOOST_CHECK_EQUAL(s,p);
 	s = "gnzc";
 	p=s;
 	
-	BOOST_CHECK_EQUAL("gn",td.matchStart(p).value);	
-	BOOST_CHECK_EQUAL("tz",td.matchStart(p).value);
+	BOOST_CHECK_EQUAL("gn",td.matchStart(p));	
+	BOOST_CHECK_EQUAL("tz",td.matchStart(p));
 	
-	BOOST_CHECK_EQUAL("ts",td.matchStart(p).value);
-	BOOST_CHECK(td.matchStart(p).hasValue == false);
+	BOOST_CHECK_EQUAL("ts",td.matchStart(p));
+	BOOST_CHECK(td.matchStart(p) == nullptr);
 	
 }
+
 
 BOOST_AUTO_TEST_CASE(bopomofo_test)
 {
 	cchar* s = "ㄓㄨㄤˋa", *p = s,*s0 = "ㄓㄨㄤˋ";
 	
 	auto syl =  bopomofo.munchSyl(p);
-	syl.value.toStr();
+	
 	BOOST_CHECK_EQUAL("a",p);
-// 	cout << typeid(syl.value).name() <<endl;
-	BOOST_CHECK_EQUAL(s0,syl.value.toStr());
-	BOOST_CHECK_EQUAL(JGRP,syl.value.group());
+	
+	BOOST_CHECK_EQUAL(s0,syl.toStr());
+	BOOST_CHECK_EQUAL(JGRP,syl.group());
 	cchar* s1 = "ㄐㄩㄢˇ";
 	p = s1;
 	auto syl1 = bopomofo.munchSyl(p);
-	BOOST_CHECK_EQUAL(GGRP,syl1.value.group());
-	BOOST_CHECK(syl1.value.isPalatized());
+	BOOST_CHECK_EQUAL(GGRP,syl1.group());
+	BOOST_CHECK(syl1.isPalatized());
 	
 	
 	fstream f("all_syllables.txt",ios_base::in);
@@ -128,8 +132,8 @@ BOOST_AUTO_TEST_CASE(bopomofo_test)
 	for(string l : lines)
 	{	cchar* pl = &l[0];
 		auto thesyl = bopomofo.munchSyl(pl);
-		string sl = thesyl.value.toStr();
-		if(!thesyl)cout << "wtf"<<","<<sl<<endl;
+		string sl = thesyl.toStr();
+// 		if(!thesyl)cout << "wtf"<<","<<sl<<endl;
 		BOOST_CHECK_EQUAL( l,sl);
 	}
 	end = system_clock::now();
@@ -139,13 +143,13 @@ BOOST_AUTO_TEST_CASE(bopomofo_test)
 	
 }
 
-BOOST_AUTO_TEST_CASE(pinyin_test)
+BOOST_AUTO_TEST_CASE(alt_pinyin_test)
 {
 	cchar* s="zhuang4",*p=s;
 	MSyl syl = pinyin.munchSyl(p);
 	string bpmf = syl.toStr();
 	cchar* pBpmf = &bpmf[0];
-	BOOST_CHECK_EQUAL(syl,bopomofo.munchSyl(pBpmf).value);
+	BOOST_CHECK_EQUAL(syl,bopomofo.munchSyl(pBpmf));
 	fstream f("all_syllables.txt",ios_base::in);
 	vector<cchar*> lines;
 	linebuf<50> lb;
@@ -156,7 +160,7 @@ BOOST_AUTO_TEST_CASE(pinyin_test)
 		MSyl thesyl = bopomofo.munchSyl(p);
 		string str = thesyl.toStr(pinyin);
 		p=&str[0];
-		BOOST_CHECK_EQUAL(thesyl,pinyin.munchSyl(p).value);
+		BOOST_CHECK_EQUAL(thesyl,pinyin.munchSyl(p));
 		
 	}
 	end = system_clock::now();
@@ -164,7 +168,7 @@ BOOST_AUTO_TEST_CASE(pinyin_test)
 		<<duration_cast<microseconds>(end-start).count()<<" microseconds.\n\n";
 	f.close();
 }
-BOOST_AUTO_TEST_CASE(mpinyin_test)
+BOOST_AUTO_TEST_CASE(pinyin_test)
 {
 	fstream f("all_syllables.txt",ios_base::in);
 	vector<cchar*> lines;
@@ -175,9 +179,9 @@ BOOST_AUTO_TEST_CASE(mpinyin_test)
 	{
 		//cchar* p = &lb;
 		MSyl syl = bopomofo.munchSyl(p);
-		string str = syl.toStr(mpinyin);
+		string str = syl.toStr(pinyin);
 		p=&str[0];
-		auto m = mpinyin.munchSyl(p).value;
+		MSyl m = pinyin.munchSyl(p);
 		BOOST_CHECK_EQUAL(syl,m);
 		if(m.toStr()!=syl.toStr())
 		{

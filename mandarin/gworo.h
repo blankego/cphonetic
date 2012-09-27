@@ -20,10 +20,10 @@
 
 #ifndef GWORO_H
 #define GWORO_H
-#include "transcriptor.h"
+#include "transliterator.h"
 namespace cphonetic
 {
-class GwoRo: public MTranscriptor 
+class GwoRo: public MTransliterator 
 {
 };
 

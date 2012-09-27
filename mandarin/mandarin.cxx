@@ -1,9 +1,12 @@
 #include "mandarin.h"
-#include "transcriptor.h"
+#include "transliterator.h"
 #include "bopomofo.h"
+#include "iosfwd"
 
 namespace cphonetic
 {
+	MSyl MSyl::Default;
+	
 	bool MSyl::operator<( MSyl rhs)const
 	{
 		return *this == rhs ? false :
@@ -13,16 +16,14 @@ namespace cphonetic
 						tone() < rhs.tone();
 				
 	}
-	CRMaybe<MSyl> MSyl::from(MTranscriptor* trans,cchar* sPtr)
-	{
-		return trans->munchSyl(sPtr);
-	}
+	
+	
 	//The default string form of MSyl is in  bopomofo notation
 	string MSyl::toStr()const
 	{
 		return bopomofo.transcribe(*this);
 	}
-	string MSyl::toStr(const MTranscriptor& trans)const
+	string MSyl::toStr(const MTransliterator& trans)const
 	{
 		return trans.transcribe(*this);
 	}

@@ -17,69 +17,114 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
 #include "pinyin.h"
 #include "mandarin.h"
-#include "tokendict.h"
+
 namespace cphonetic
 {
+
+
 using namespace msound;
-
-CRMaybe<MSyl> Pinyin::munchSyl(cchar*& pStr)const
+MSyl Pinyin::munchSyl ( cchar*& pStr ) const
 {
+	auto start = pStr;
 	INIT init = Void;
-	MED med = MED(0);
+	MED med = MED ( 0 );
 	FIN fin = ZERO;
-	TONE tone;
-	auto pr = _imDict.matchStart(pStr);
+	TONE t1 = NEUTRAL, t2 = NEUTRAL;
+	MSyl syl = _miDict.matchStart ( pStr );
 
-	if(pr)PASSIGN(init, med, pr.value);
+	do
+	{
+		if ( syl )
+		{
+			init = syl.init();
+			med = syl.med();
+			t1 = syl.tone();
+		}
 
-	if(init >= J && med == IU) {
-		fin = Y;
-	} else {
-		fin = _fDict.matchStart(pStr);
+		auto pMark = pStr;
 
-		if(fin == E && ((med & I) == I)) {
-			fin = EH;
-		} else if(fin == Y) {
-			fin = ENG;//TODO:
+		MSyl syl2 = _mfDict.matchStart ( pStr );
+		if ( syl2 )
+		{
+			t2 = syl2.tone();
 
-			if(med == I)
-				med = IU;//TODO:
+			if ( t2 != NEUTRAL && t1 != NEUTRAL )
+			{
+				pStr = pMark;
+				break;
+			}
+
+			fin = syl2.fin();
+			if ( syl2.med() == U )
+			{
+				if ( syl2.fin() == ZERO && med == I ) //IU
+					fin = OU;
+				else if ( syl2.fin() == ENG ) //ONG
+				{
+					med = MED ( med | U );
+					fin = syl2.fin();
+				}
+				else
+					pStr = pMark;
+			}
+			else
+			{
+				fin = syl2.fin();
+				if( fin == Y && med == U )
+				{
+					fin = EI;
+				}
+				else if ( fin == E && ( ( med & I ) == I ) ) //ie,üe
+				{
+					fin = EH;
+				}
+			}
+		}
+
+	}
+	while ( 0 );
+
+	if ( ( init | med | fin ) == 0 ) return MSyl::Default;
+
+	return MSyl ( init, med, fin, ( t1 == NEUTRAL ? t2 : t1 ) );
+}
+
+string Pinyin::transcribe ( const MSyl& syl ) const
+{
+	static cchar* empty = "";
+	string start, end;
+	INIT i = syl.init();
+	TONE t = syl.tone();
+	MED m = syl.med();
+	RIME r = syl.rime();
+
+
+	//initial
+	if ( i == Void && m != KAI ) //y w yu
+	{
+		return _m0Trans[MSyl ( r,t )];
+	}
+	else if ( syl.group() == GGRP && syl.isPalatized() )  //j q x
+	{
+		start = _specInit[i];
+		if ( m == IU && syl.fin() != ENG ) //ü -> u but not iong
+		{
+			r = ( RIME ) ( U | syl.fin() ); //ju qu xu
 		}
 	}
-
-	if((init | med | fin) == 0)return nullptr;
-
-	tone = _tDict.matchStart(pStr);
-
-	return MSyl(init, med, fin, tone);
-}
-
-
-string Pinyin::transcribe(const MSyl& syl)const
-{
-	string im, f;
-	im = _imTrans[make_pair(syl.init(), syl.med())];
-
-	if(syl.fin() == ZERO) {
-		if(syl.init() == Void)
-			f = syl.med() == I ? "i" : syl.med() == U ? "u" : "";
-		else
-			f = "";
-	} else if(syl.fin() == EI && syl.med() == U)
-		f = syl.init() == Void ? "ei": "i";
-	else if(syl.fin() == OU && syl.med() == I )
-		f = syl.init() == Void ? "ou": "u";
-	else if(syl.fin() == EH && syl.med() == KAI)
-		f = "ê";
+	else if ( syl.group() == TZGRP && m == I && syl.fin() == ZERO )  //zyi cyi syi
+	{
+		start = _specInit[i];
+	}
 	else
-		f = _fTrans[syl.fin()];
+		start = _miTrans[i];
 
+	//final
+	end = _mfTrans[MSyl ( r,t )];
 
-	return im + f + _tTrans[syl.tone()];
+	return start + end;
 }
-
 const Pinyin pinyin;
-}//end namespace
+}//end cphonetic

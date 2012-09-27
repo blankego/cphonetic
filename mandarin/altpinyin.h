@@ -18,38 +18,29 @@
 */
 
 
-#ifndef MARKED_PINYIN_H
-#define MARKED_PINYIN_H
-#include "transliterator.h"
-#include "tokendict.h"
-#include <map>
-#include <vector>
-#include "msound.h"
+#ifndef PINYIN_H
+#define PINYIN_H
 
+#include <map>
+#include <string>
+#include "pinyin.h"
 namespace cphonetic 
 {	
 
-
 class MSyl;
 using namespace msound;
-class Pinyin : public MTransliterator
+using namespace std; 
+
+class AltPinyin: public Pinyin
 {
-protected:
-	static TokenDict<MSyl> _miDict;
-	static TokenDict<MSyl > _mfDict;
-	static map<INIT,cchar*> _miTrans;
-	static map<INIT,cchar*> _specInit;
-	static map<MSyl,cchar*> _mfTrans; 	
-	static map<MSyl,cchar*> _m0Trans;//yi wu yu
-	static vector<cchar*> _ui;
-	static vector<cchar*> _iu;
-	
+	static TokenDict<TONE> _tDict;
+	static map<TONE,cchar*> _tTrans;
 	
 public:
 	virtual MSyl munchSyl(cchar*& pStr)const;
 	virtual string transcribe(const MSyl& syl)const;
-	
-
 };
-}//end cphonetic
-#endif // MARKED_PINYIN_H
+
+}//end namespace
+
+#endif // PINYIN_H

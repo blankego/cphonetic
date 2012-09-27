@@ -19,7 +19,7 @@
 
 #include "bopomofo.h"
 #include "mandarin.h"
-#include "tokendict.h"
+
 namespace cphonetic
 {
 using namespace msound;
@@ -75,19 +75,19 @@ map<INIT, cchar*> Bopomofo::_giGrp = {
 };
 //end Bopomofo dictionaries
 
-CRMaybe<MSyl> Bopomofo::munchSyl(cchar*& pStr) const
+MSyl Bopomofo::munchSyl(cchar*& pStr) const
 {
 
-	if(!pStr)return nullptr;
+	if(!pStr)return MSyl::Default;
 
 	auto init = _iDict.matchStart(pStr);
 	auto med = _mDict.matchStart(pStr);
 	auto fin = _fDict.matchStart(pStr);
 
-	if(!init.hasValue && !med.hasValue && !fin.hasValue)return nullptr;
+	if(init == Void && med == KAI && fin == ZERO)return MSyl::Default;
 
 	if(med != KAI && fin == Y)//ㄧㄨㄩ as stand alone rimes
-		fin = crmaybe(ZERO);
+		fin = ZERO;
 
 	auto tone = _tDict.matchStart(pStr);
 	return MSyl(init, med, fin, tone);

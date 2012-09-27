@@ -18,38 +18,47 @@
 */
 
 
-#ifndef MARKED_PINYIN_H
-#define MARKED_PINYIN_H
-#include "transliterator.h"
+#include "altpinyin.h"
+#include "mandarin.h"
 #include "tokendict.h"
-#include <map>
-#include <vector>
 #include "msound.h"
-
-namespace cphonetic 
-{	
-
-
-class MSyl;
-using namespace msound;
-class Pinyin : public MTransliterator
+namespace cphonetic
 {
-protected:
-	static TokenDict<MSyl> _miDict;
-	static TokenDict<MSyl > _mfDict;
-	static map<INIT,cchar*> _miTrans;
-	static map<INIT,cchar*> _specInit;
-	static map<MSyl,cchar*> _mfTrans; 	
-	static map<MSyl,cchar*> _m0Trans;//yi wu yu
-	static vector<cchar*> _ui;
-	static vector<cchar*> _iu;
-	
-	
-public:
-	virtual MSyl munchSyl(cchar*& pStr)const;
-	virtual string transcribe(const MSyl& syl)const;
-	
+using namespace msound;
 
+TokenDict<TONE> AltPinyin::_tDict ({
+	{"ˉ",DARK},{"ˊ",LIGHT},{"ˇ",RISING},{"ˋ",DEPARTING},
+	{"·",ENTERING},{"˙",NEUTRAL},{"",NEUTRAL},
+	{"1",DARK},{"2",LIGHT},{"3",RISING},{"4",DEPARTING},
+	{"0",ENTERING},{"5",NEUTRAL},
+	
+});
+	
+	
+map<TONE,cchar*> AltPinyin::_tTrans = {
+	{DARK,"1"},{LIGHT,"2"},{RISING,"3"},{DEPARTING,"4"},
+	{ENTERING,"0"},{NEUTRAL,"5"}
 };
-}//end cphonetic
-#endif // MARKED_PINYIN_H
+
+MSyl AltPinyin::munchSyl(cchar*& pStr)const
+{
+	
+	MSyl syl = Pinyin::munchSyl(pStr);
+	if(syl && syl.tone() == NEUTRAL)
+		syl.tone(_tDict.matchStart(pStr));
+
+	return syl;
+}
+
+
+string AltPinyin::transcribe(const MSyl& syl)const
+{
+	TONE t = syl.tone();
+	MSyl sylNoTone (syl);
+	sylNoTone.tone(NEUTRAL);
+	string s = Pinyin::transcribe(sylNoTone);
+	return s + _tTrans[t];
+}
+
+const AltPinyin alt_pinyin;
+}//end namespace

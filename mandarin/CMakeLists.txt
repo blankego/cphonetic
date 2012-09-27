@@ -1,10 +1,11 @@
-SET(mandarin_lib_src gworo.cxx 
-	marked_pinyin.cxx 
-	marked_pinyin_data.cxx
-	bopomofo.cxx 
+SET(mandarin_lib_src 
 	mandarin.cxx 
-	pinyin.cxx 
+	bopomofo.cxx
+	pinyin.cxx
 	pinyin_data.cxx
+	altpinyin.cxx
+	gworo.cxx
 	)
 
 add_library(mandarin ${mandarin_lib_src})
+
